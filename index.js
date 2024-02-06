@@ -1,14 +1,19 @@
 const express = require('express');
 const Redis = require('redis'); //Import Redis Class from the Library
 const bodyParser = require('body-parser');
+const cors = require('cors') 
+  
+  
+
 
 //import express from 'express'
 const redisClient = Redis.createClient({
     url:`redis://localhost:6379`
 });
 const app = express(); //creates an express application
-const port = 3000; //port #
-
+const port = 3001; //port #
+// enabling CORS for any unknown origin(https://xyz.example.com) 
+app.use(cors());
 app.use(bodyParser.json()); // use bodyParser
 
 app.listen(port,()=>{
@@ -20,7 +25,8 @@ app.listen(port,()=>{
 app.get('/boxes',async (req,res)=>{
     let boxes = await redisClient.json.get('boxes',{path:'$'});// get the boxes
     //send the boxes to the browser
-    res.json(boxes);//convert boxes to a JSON string
+    console.log(boxes)
+    res.json(boxes[0]);//convert boxes to a JSON string
 });
 
 app.post('/boxes', async (req, res) => {
@@ -31,4 +37,4 @@ app.post('/boxes', async (req, res) => {
 
  });
 
-console.log("hello");
+console.log("Hello");
