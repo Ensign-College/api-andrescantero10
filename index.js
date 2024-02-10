@@ -37,4 +37,46 @@ app.post('/boxes', async (req, res) => {
 
  });
 
+//hw
+ app.post('/customers', async (req, res) => {
+    const { customerId, name } = req.body; // Destructure customerId and name from the request body
+    
+    if (!customerId || !name) {
+        return res.status(400).send("Customer ID and name are required.");// If either customerId or name is not provided, send 400 Bad Request response
+
+    }
+    
+    const customerKey = `customer:${customerId}`; // Construct the Redis key for the customer using customerId
+
+    const customerData = { customerId, name };
+
+    const existingCustomer = await redisClient.json.get(customerKey, '$');// Check if the customer already exists to avoid overwriting existing data
+
+    if (existingCustomer) {
+        return res.status(409).send(`Customer with ID ${customerId} already exists.`);// If the customer already exists, send a 409 Conflict response
+
+    }
+
+    await redisClient.json.set(customerKey, '$', customerData);// Save the customer data as a JSON object in Redis
+
+
+    res.status(201).json(customerData);// Respond with the saved customer data
+
+});
+
+app.get('/customers', async (req, res) => {
+    try {
+        const customerKeys = await redisClient.keys('customer:*');
+        const customers = await Promise.all(customerKeys.map(async (key) => {
+            const customerData = await redisClient.json.get(key, {path: '$'});
+            return customerData;
+        }));
+
+        res.json(customers); // Send all customers as JSON
+    } catch (error) {
+        console.error('Failed to fetch customers:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 console.log("Hello");
