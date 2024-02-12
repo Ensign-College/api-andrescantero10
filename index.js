@@ -39,16 +39,20 @@ app.post('/boxes', async (req, res) => {
 
 //hw
  app.post('/customers', async (req, res) => {
-    const { customerId, name } = req.body; // Destructure customerId and name from the request body
-    
-    if (!customerId || !name) {
+    const { firstName, lastName, phoneNumber } = req.body; // Destructure customerId and name from the request body
+    if (!firstName || !lastName) {
         return res.status(400).send("Customer ID and name are required.");// If either customerId or name is not provided, send 400 Bad Request response
 
     }
+    const user = {
+        firstName,
+        lastName,
+        phoneNumber,
+    }
     
-    const customerKey = `customer:${customerId}`; // Construct the Redis key for the customer using customerId
-
-    const customerData = { customerId, name };
+    
+    
+    const customerKey = `customer:${user.phoneNumber}`; // Construct the Redis key for the customer using customerId
 
     const existingCustomer = await redisClient.json.get(customerKey, '$');// Check if the customer already exists to avoid overwriting existing data
 
@@ -57,10 +61,10 @@ app.post('/boxes', async (req, res) => {
 
     }
 
-    await redisClient.json.set(customerKey, '$', customerData);// Save the customer data as a JSON object in Redis
+    await redisClient.json.set(customerKey, '$', user);// Save the customer data as a JSON object in Redis
 
 
-    res.status(201).json(customerData);// Respond with the saved customer data
+    res.status(201).json(user);// Respond with the saved customer data
 
 });
 
@@ -68,8 +72,8 @@ app.get('/customers', async (req, res) => {
     try {
         const customerKeys = await redisClient.keys('customer:*');
         const customers = await Promise.all(customerKeys.map(async (key) => {
-            const customerData = await redisClient.json.get(key, {path: '$'});
-            return customerData;
+            const cutomers = await redisClient.json.get(key, {path: '$'});
+            return cutomers;
         }));
 
         res.json(customers); // Send all customers as JSON
