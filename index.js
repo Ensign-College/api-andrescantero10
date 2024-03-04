@@ -82,6 +82,22 @@ app.get("/customers", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+app.get("/customers/:phoneNumber", async (req, res) => {
+    const customerKey = `customer:${req.params.phoneNumber}`; // Construct the Redis key for the customer using customerId
+    
+    try {
+        const customer = await redisClient.json.get(customerKey, { path: "$" }); // Get the customer data from Redis
+        if (customer) {
+        res.json(customer); // Send the customer as JSON
+        } else {
+        res.status(404).send("Customer not found"); // Send a 404 Not Found response if the customer does not exist
+        }
+    } catch (error) {
+        console.error("Failed to fetch customer:", error);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
 
 app.post("/orders", async (req, res) => {
   const order = req.body; // Get the order object from the request body
@@ -144,4 +160,5 @@ app.get("/orderItems/:orderItemId", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" }); // Send a 500 Internal Server Error response
   }
 });
+
 console.log("Hello");
