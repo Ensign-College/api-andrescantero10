@@ -106,12 +106,13 @@ app.post("/orders", async (req, res) => {
   try {
     // Saving the entire order object as a JSON in Redis
     await redisClient.json.set(orderId, "$", order); // Save the order in Redis
-    res.status(201).send({ message: "Order saved successfully" });
+    res.status(201).send({ message: "Order saved successfully", order }); // Send a 201 Created response with the order ID
   } catch (error) {
     console.error("Failed to add order:", error);
     res.status(500).send("Internal Server Error");
   }
 });
+
 
 app.get("/orders/:orderId", async (req, res) => {
   const orderId = `order:${req.params.orderId}`; // Ensure this matches the saving key format
