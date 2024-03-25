@@ -2,23 +2,65 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
 Resources:
-#  MyLambdaFunction:
-#    Type: 'AWS::Serverless::Function'
-#    Properties:
-#      Handler: index.handler
-#      Runtime: nodejs14.x
-#      CodeUri: ./lambda
-#      MemorySize: 128
-#      Timeout: 30
-#      Environment:
-#        Variables:
-#          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpointAddress
-#      Events:
-#        MyApi:
-#          Type: Api
-#          Properties:
-#            Path: /myendpoint
-#            Method: get
+
+  MyElasticacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Subnet group for ElastiCache
+      SubnetIds:
+        - subnet-02c217f126c0ce1d5
+  MyLambdaFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: indexlocal.handler
+      Runtime: nodejs14.x
+      CodeUri: ./lambda
+      MemorySize: 128
+      Timeout: 30
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpointAddress
+      VpcConfig:
+        SubnetIds:
+          - !Ref MySubnet
+        SecurityGroupIds:
+          - !GetAtt MySecurityGroup.GroupId
+      Events:
+        RootPath:
+          Type: Api
+          Properties:
+            Path: /
+            Method: any
+        CustomersPath:
+          Type: Api
+          Properties:
+            Path: /customers
+            Method: any
+        CustomersByPhonePath:
+          Type: Api
+          Properties:
+            Path: /customers/{phoneNumber}
+            Method: any
+        OrdersPath:
+          Type: Api
+          Properties:
+            Path: /orders
+            Method: any
+        OrdersByIdPath:
+          Type: Api
+          Properties:
+            Path: /orders/{orderId}
+            Method: any
+        OrderItemsPath:
+          Type: Api
+          Properties:
+            Path: /orderItems
+            Method: any
+        OrderItemsByIdPath:
+          Type: Api
+          Properties:
+            Path: /orderItems/{orderItemId}
+            Method: any
 
   MyVPC:
     Type: AWS::EC2::VPC
@@ -28,7 +70,7 @@ Resources:
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC
+      VpcId: vpc-066e6a637e37f2752
       CidrBlock: 10.0.0.0/24
 
   MyElasticacheSubnetGroup:
@@ -52,12 +94,75 @@ Resources:
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for Lambda function
-      VpcId: !Ref MyVPC
+      GroupDescription: Allow access to ElastiCache Redis
+      VpcId: vpc-066e6a637e37f2752
+      # VpcId: !Ref MyVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 6379
           ToPort: 6379
           CidrIp: 0.0.0.0/0
+
+
+
+
+
+
+# AWSTemplateFormatVersion: '2010-09-09'
+# Transform: 'AWS::Serverless-2016-10-31'
+
+# Resources:
+# #  MyLambdaFunction:
+# #    Type: 'AWS::Serverless::Function'
+# #    Properties:
+# #      Handler: index.handler
+# #      Runtime: nodejs14.x
+# #      CodeUri: ./lambda
+# #      MemorySize: 128
+# #      Timeout: 30
+# #      Environment:
+# #        Variables:
+# #          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpointAddress
+# #      Events:
+# #        MyApi:
+# #          Type: Api
+# #          Properties:
+# #            Path: /myendpoint
+# #            Method: get
+
+#   MyVPC:
+#     Type: AWS::EC2::VPC
+#     Properties:
+#       CidrBlock: 10.0.0.0/16
+
+#   MySubnet:
+#     Type: AWS::EC2::Subnet
+#     Properties:
+#       VpcId: !Ref MyVPC
+#       CidrBlock: 10.0.0.0/24
+
+
+
+#   MyElasticacheRedis:
+#     Type: 'AWS::ElastiCache::CacheCluster'
+#     Properties:
+#       CacheNodeType: cache.t2.micro
+#       Engine: redis
+#       NumCacheNodes: 1
+#       Port: 6379
+#       VpcSecurityGroupIds:
+#         - !GetAtt MySecurityGroup.GroupId
+#       CacheSubnetGroupName: !Ref MyElasticacheSubnetGroup
+
+#   MySecurityGroup:
+#     Type: AWS::EC2::SecurityGroup
+#     Properties:
+#       GroupDescription: Security group for Lambda function
+#       VpcId: !Ref MyVPC
+#       SecurityGroupIngress:
+#         - IpProtocol: tcp
+#           FromPort: 6379
+#           ToPort: 6379
+#           CidrIp: 0.0.0.0/0
 
 
