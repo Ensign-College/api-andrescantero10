@@ -13,7 +13,7 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: indexlocal.handler
-      Runtime: nodejs20x
+      Runtime: nodejs20.x
       CodeUri: ./lambda-andres-function.zip
       MemorySize: 128
       Timeout: 30
