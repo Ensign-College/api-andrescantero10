@@ -19,7 +19,7 @@ Resources:
       Timeout: 30
       Environment:
         Variables:
-          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpointAddress
+          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
       VpcConfig:
         SubnetIds:
           - !Ref MySubnet
