@@ -22,7 +22,8 @@ Resources:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
       VpcConfig:
         SubnetIds:
-          - !Ref MySubnet
+          # - !Ref MySubnet
+          - subnet-02c217f126c0ce1d5
         SecurityGroupIds:
           - !GetAtt MySecurityGroup.GroupId
       Events:
@@ -67,11 +68,11 @@ Resources:
   #   Properties:
   #     CidrBlock: 10.0.0.0/16
 
-  MySubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: vpc-066e6a637e37f2752
-      CidrBlock: 10.0.0.40/24
+  # MySubnet:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: vpc-066e6a637e37f2752
+  #     CidrBlock: 10.0.0.0/24
 
   MyElasticacheSubnetGroup:
     Type: AWS::ElastiCache::SubnetGroup
