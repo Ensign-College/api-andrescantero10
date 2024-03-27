@@ -62,16 +62,16 @@ Resources:
             Path: /orderItems/{orderItemId}
             Method: any
 
-  MyVPC:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: 10.0.0.0/16
+  # MyVPC:
+  #   Type: AWS::EC2::VPC
+  #   Properties:
+  #     CidrBlock: 10.0.0.0/16
 
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: vpc-066e6a637e37f2752
-      CidrBlock: 10.0.0.0/24
+      CidrBlock: 10.0.0.40/24
 
   MyElasticacheSubnetGroup:
     Type: AWS::ElastiCache::SubnetGroup
