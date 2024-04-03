@@ -15,7 +15,7 @@ const redisClient = Redis.createClient({
 });
 
 exports.handler = async (event) => {
-  await redisClient.connect();
+  await redisClient.connect(); // Connect to Redis
 
   try {
     switch (event.path) {
