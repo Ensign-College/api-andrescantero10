@@ -11,12 +11,12 @@ const Schema = JSON.parse(fs.readFileSync("./orderItemSchema.json", "utf-8"));
 const ajv = new Ajv();
 
 const redisClient = Redis.createClient({
-  url: 'redis://${process.env.REDIS_HOST}:6379',
+  url: `redis://${process.env.REDIS_HOST}:6379`,
 });
 
 exports.handler = async (event) => {
   await redisClient.connect();
-  
+
   try {
     switch (event.path) {
       case "/customers":
@@ -43,7 +43,7 @@ exports.handler = async (event) => {
       case event.path.match(/^\/orders\/\w+$/) && event.path:
         if (event.httpMethod === "GET") {
           // Handle GET /orders/:orderId
-          return await handleGetOrderByOrderId(event); 
+          return await handleGetOrderByOrderId(event);
         }
         break;
       case "/orderItems":
@@ -80,7 +80,9 @@ async function handlePostCustomers(event) {
   if (!firstName || !lastName || !phoneNumber) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ message: "Missing required customer information." }),
+      body: JSON.stringify({
+        message: "Missing required customer information.",
+      }),
     };
   }
   const customerKey = `customer:${phoneNumber}`;
@@ -91,16 +93,27 @@ async function handlePostCustomers(event) {
       body: JSON.stringify({ message: "Customer already exists." }),
     };
   }
-  await redisClient.json.set(customerKey, "$", { firstName, lastName, phoneNumber });
+  await redisClient.json.set(customerKey, "$", {
+    firstName,
+    lastName,
+    phoneNumber,
+  });
   return {
     statusCode: 201,
-    body: JSON.stringify({ message: "Customer created successfully.", firstName, lastName, phoneNumber }),
+    body: JSON.stringify({
+      message: "Customer created successfully.",
+      firstName,
+      lastName,
+      phoneNumber,
+    }),
   };
 }
 async function handleGetCustomers(event) {
   const customerKeys = await redisClient.keys("customer:*");
   const customers = await Promise.all(
-    customerKeys.map(async (key) => await redisClient.json.get(key, { path: "$" }))
+    customerKeys.map(
+      async (key) => await redisClient.json.get(key, { path: "$" })
+    )
   );
   return {
     statusCode: 200,
@@ -158,14 +171,20 @@ async function handlePostOrderItems(event) {
   if (!validate(orderItem)) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ message: "Invalid order item data.", errors: validate.errors }),
+      body: JSON.stringify({
+        message: "Invalid order item data.",
+        errors: validate.errors,
+      }),
     };
   }
   // Assuming addOrderItem function returns an ID or similar identifier for the new order item
   const orderItemId = await addOrderItem({ redisClient, orderItem });
   return {
     statusCode: 201,
-    body: JSON.stringify({ message: "Order item added successfully.", orderItemId }),
+    body: JSON.stringify({
+      message: "Order item added successfully.",
+      orderItemId,
+    }),
   };
 }
 async function handleGetOrderItemByOrderItemId(event) {
@@ -184,7 +203,6 @@ async function handleGetOrderItemByOrderItemId(event) {
 }
 
 // Implement other handler functions similarly
-
 
 // const app = express(); //creates an express application
 // const port = 3001; //port #
@@ -256,7 +274,7 @@ async function handleGetOrderItemByOrderItemId(event) {
 // });
 // app.get("/customers/:phoneNumber", async (req, res) => {
 //     const customerKey = `customer:${req.params.phoneNumber}`; // Construct the Redis key for the customer using customerId
-    
+
 //     try {
 //         const customer = await redisClient.json.get(customerKey, { path: "$" }); // Get the customer data from Redis
 //         if (customer) {
@@ -269,7 +287,6 @@ async function handleGetOrderItemByOrderItemId(event) {
 //         res.status(500).send("Internal Server Error");
 //     }
 // });
-
 
 // app.post("/orders", async (req, res) => {
 //   const order = req.body; // Get the order object from the request body
@@ -284,7 +301,6 @@ async function handleGetOrderItemByOrderItemId(event) {
 //     res.status(500).send("Internal Server Error");
 //   }
 // });
-
 
 // app.get("/orders/:orderId", async (req, res) => {
 //   const orderId = `order:${req.params.orderId}`; // Ensure this matches the saving key format
