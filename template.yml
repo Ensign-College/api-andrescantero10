@@ -14,7 +14,7 @@ Resources:
     Properties:
       Handler: indexlocal.handler
       Runtime: nodejs20.x
-      CodeUri: ./lambda-andres-function.zip
+      CodeUri: .
       MemorySize: 128
       Timeout: 30
       Environment:
