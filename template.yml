@@ -12,7 +12,7 @@ Resources:
   MyLambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: indexlocal.handler
+      Handler: index.handler
       Runtime: nodejs20.x
       CodeUri: .
       MemorySize: 128
