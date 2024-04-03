@@ -1,10 +1,4 @@
-// Import Redis client
-const Redis = require("redis");
 
-// Create Redis client
-const redisClient = Redis.createClient({
-  url: "redis://localhost:6379",
-});
 
 // Function to add an order item to Redis
 const addOrderItem = async ({ redisClient, orderItem }) => {
