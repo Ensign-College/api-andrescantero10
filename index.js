@@ -17,8 +17,9 @@ const redisClient = Redis.createClient({
 exports.handler = async (event) => {
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Hello from Lambda!" }),
+    body: JSON.stringify({ message: "Hello from Lambda!", event}), 
   };
+  
   }
   // await redisClient.connect(); // Connect to Redis
 
@@ -78,7 +79,7 @@ exports.handler = async (event) => {
   // } finally {
   //   await redisClient.disconnect();
   // }
-};
+// };
 
 async function handlePostCustomers(event) {
   const { firstName, lastName, phoneNumber } = JSON.parse(event.body);

@@ -9,11 +9,11 @@ Resources:
       Description: Subnet group for ElastiCache
       SubnetIds:
         - subnet-02c217f126c0ce1d5
+
   MyLambdaFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: index.handler
-      # indexlocal.handler
       Runtime: nodejs20.x
       CodeUri: .
       MemorySize: 128
@@ -23,46 +23,72 @@ Resources:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
       VpcConfig:
         SubnetIds:
-          # - !Ref MySubnet
           - subnet-02c217f126c0ce1d5
         SecurityGroupIds:
           - !GetAtt MySecurityGroup.GroupId
       Events:
-        RootPath:
-          Type: Api
-          Properties:
-            Path: /
-            Method: any
-        CustomersPath:
-          Type: Api
-          Properties:
-            Path: /customers
-            Method: any
-        CustomersByPhonePath:
-          Type: Api
-          Properties:
-            Path: /customers/{phoneNumber}
-            Method: any
-        OrdersPath:
-          Type: Api
-          Properties:
-            Path: /orders
-            Method: any
-        OrdersByIdPath:
-          Type: Api
-          Properties:
-            Path: /orders/{orderId}
-            Method: any
-        OrderItemsPath:
-          Type: Api
-          Properties:
-            Path: /orderItems
-            Method: any
-        OrderItemsByIdPath:
-          Type: Api
-          Properties:
-            Path: /orderItems/{orderItemId}
-            Method: any
+      RootPath:
+        Type: Api
+        Properties:
+          Path: /
+          Method: get
+
+     
+
+  # MyLambdaFunction:
+  #   Type: 'AWS::Serverless::Function'
+  #   Properties:
+  #     Handler: index.handler
+  #     # indexlocal.handler
+  #     Runtime: nodejs20.x
+  #     CodeUri: .
+  #     MemorySize: 128
+  #     Timeout: 30
+  #     Environment:
+  #       Variables:
+  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+  #     VpcConfig:
+  #       SubnetIds:
+  #         # - !Ref MySubnet
+  #         - subnet-02c217f126c0ce1d5
+  #       SecurityGroupIds:
+  #         - !GetAtt MySecurityGroup.GroupId
+  #     Events:
+  #       RootPath:
+  #         Type: Api
+  #         Properties:
+  #           Path: /
+  #           Method: any
+  #       CustomersPath:
+  #         Type: Api
+  #         Properties:
+  #           Path: /customers
+  #           Method: any
+  #       CustomersByPhonePath:
+  #         Type: Api
+  #         Properties:
+  #           Path: /customers/{phoneNumber}
+  #           Method: any
+  #       OrdersPath:
+  #         Type: Api
+  #         Properties:
+  #           Path: /orders
+  #           Method: any
+  #       OrdersByIdPath:
+  #         Type: Api
+  #         Properties:
+  #           Path: /orders/{orderId}
+  #           Method: any
+  #       OrderItemsPath:
+  #         Type: Api
+  #         Properties:
+  #           Path: /orderItems
+  #           Method: any
+  #       OrderItemsByIdPath:
+  #         Type: Api
+  #         Properties:
+  #           Path: /orderItems/{orderItemId}
+  #           Method: any
 
   # MyVPC:
   #   Type: AWS::EC2::VPC
