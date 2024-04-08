@@ -27,11 +27,11 @@ Resources:
         SecurityGroupIds:
           - !GetAtt MySecurityGroup.GroupId
       Events:
-      RootPath:
-        Type: Api
-        Properties:
-          Path: /api
-          Method: any
+        RootPath:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
 
      
 
