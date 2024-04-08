@@ -14,11 +14,30 @@ const redisClient = Redis.createClient({
 });
 
 exports.handler = async (event) => {
+  const { httpMethod } = event;
   event.redisClient = redisClient;
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: "Hello from Lambda!", event}), 
-  };
+  if (httpMethod === "GET") {
+    return{
+      statusCode: 200,
+      body: JSON.stringify({ message: "Hello from GET!", event}), 
+    };
+  }
+  else if (httpMethod === "POST") {
+  
+    return{
+      statusCode: 200,
+      body: JSON.stringify({ message: "Hello from POST!", event}), 
+    };
+  } else {
+    return {
+      statusCode: 405,
+      body: "Method Not Allowed",
+    };
+  }
+  // return {
+  //   statusCode: 200,
+  //   body: JSON.stringify({ message: "Hello from Lambda!", event}), 
+  // };
   
   }
   // await redisClient.connect(); // Connect to Redis
