@@ -1,18 +1,17 @@
-const express = require("express");
-const cors = require("cors");
-const fs = require("fs");
-const Redis = require("redis");
-const bodyParser = require("body-parser");
-const Ajv = require("ajv");
-const { addOrder, getOrder } = require("./orderservice.js");
-const { addOrderItem, getOrderItem } = require("./orderItems.js");
 
-const Schema = JSON.parse(fs.readFileSync("./orderItemSchema.json", "utf-8"));
-const ajv = new Ajv();
+// const fs = require("fs");
+// const Redis = require("redis");
+// const bodyParser = require("body-parser");
+// const Ajv = require("ajv");
+// const { addOrder, getOrder } = require("./orderservice.js");
+// const { addOrderItem, getOrderItem } = require("./orderItems.js");
 
-const redisClient = Redis.createClient({
-  url: `redis://${process.env.REDIS_HOST}:6379`,
-});
+// const Schema = JSON.parse(fs.readFileSync("./orderItemSchema.json", "utf-8"));
+// const ajv = new Ajv();
+
+// const redisClient = Redis.createClient({
+//   url: `redis://${process.env.REDIS_HOST}:6379`,
+// });
 
 exports.handler = async (event) => {
   return {
@@ -81,132 +80,137 @@ exports.handler = async (event) => {
   // }
 // };
 
-async function handlePostCustomers(event) {
-  const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
-  if (!firstName || !lastName || !phoneNumber) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Missing required customer information.",
-      }),
-    };
-  }
-  const customerKey = `customer:${phoneNumber}`;
-  const existingCustomer = await redisClient.json.get(customerKey, "$");
-  if (existingCustomer) {
-    return {
-      statusCode: 409,
-      body: JSON.stringify({ message: "Customer already exists." }),
-    };
-  }
-  await redisClient.json.set(customerKey, "$", {
-    firstName,
-    lastName,
-    phoneNumber,
-  });
-  return {
-    statusCode: 201,
-    body: JSON.stringify({
-      message: "Customer created successfully.",
-      firstName,
-      lastName,
-      phoneNumber,
-    }),
-  };
-}
-async function handleGetCustomers(event) {
-  const customerKeys = await redisClient.keys("customer:*");
-  const customers = await Promise.all(
-    customerKeys.map(
-      async (key) => await redisClient.json.get(key, { path: "$" })
-    )
-  );
-  return {
-    statusCode: 200,
-    body: JSON.stringify(customers),
-  };
-}
-async function handleGetCustomerByPhoneNumber(event) {
-  const phoneNumber = event.pathParameters.phoneNumber;
-  const customerKey = `customer:${phoneNumber}`;
-  const customer = await redisClient.json.get(customerKey, "$");
-  if (!customer) {
-    return {
-      statusCode: 404,
-      body: JSON.stringify({ message: "Customer not found." }),
-    };
-  }
-  return {
-    statusCode: 200,
-    body: JSON.stringify(customer),
-  };
-}
-async function handlePostOrders(event) {
-  const order = JSON.parse(event.body);
-  if (!order.orderId) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ message: "Missing order ID." }),
-    };
-  }
-  const orderKey = `order:${order.orderId}`;
-  await redisClient.json.set(orderKey, "$", order);
-  return {
-    statusCode: 201,
-    body: JSON.stringify({ message: "Order created successfully.", order }),
-  };
-}
-async function handleGetOrderByOrderId(event) {
-  const orderId = event.pathParameters.orderId;
-  const orderKey = `order:${orderId}`;
-  const order = await redisClient.json.get(orderKey, "$");
-  if (!order) {
-    return {
-      statusCode: 404,
-      body: JSON.stringify({ message: "Order not found." }),
-    };
-  }
-  return {
-    statusCode: 200,
-    body: JSON.stringify(order),
-  };
-}
-async function handlePostOrderItems(event) {
-  const orderItem = JSON.parse(event.body);
-  const validate = ajv.compile(Schema);
-  if (!validate(orderItem)) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Invalid order item data.",
-        errors: validate.errors,
-      }),
-    };
-  }
-  // Assuming addOrderItem function returns an ID or similar identifier for the new order item
-  const orderItemId = await addOrderItem({ redisClient, orderItem });
-  return {
-    statusCode: 201,
-    body: JSON.stringify({
-      message: "Order item added successfully.",
-      orderItemId,
-    }),
-  };
-}
-async function handleGetOrderItemByOrderItemId(event) {
-  const orderItemId = event.pathParameters.orderItemId;
-  const orderItem = await getOrderItem({ redisClient, orderItemId });
-  if (!orderItem) {
-    return {
-      statusCode: 404,
-      body: JSON.stringify({ message: "Order item not found." }),
-    };
-  }
-  return {
-    statusCode: 200,
-    body: JSON.stringify(orderItem),
-  };
-}
+// async function handlePostCustomers(event) {
+//   const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
+//   if (!firstName || !lastName || !phoneNumber) {
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify({
+//         message: "Missing required customer information.",
+//       }),
+//     };
+//   }
+//   const customerKey = `customer:${phoneNumber}`;
+//   const existingCustomer = await redisClient.json.get(customerKey, "$");
+//   if (existingCustomer) {
+//     return {
+//       statusCode: 409,
+//       body: JSON.stringify({ message: "Customer already exists." }),
+//     };
+//   }
+//   await redisClient.json.set(customerKey, "$", {
+//     firstName,
+//     lastName,
+//     phoneNumber,
+//   });
+//   return {
+//     statusCode: 201,
+//     body: JSON.stringify({
+//       message: "Customer created successfully.",
+//       firstName,
+//       lastName,
+//       phoneNumber,
+//     }),
+//   };
+// }
+// async function handleGetCustomers(event) {
+//   const customerKeys = await redisClient.keys("customer:*");
+//   const customers = await Promise.all(
+//     customerKeys.map(
+//       async (key) => await redisClient.json.get(key, { path: "$" })
+//     )
+//   );
+//   return {
+//     statusCode: 200,
+//     body: JSON.stringify(customers),
+//   };
+// }
+// async function handleGetCustomerByPhoneNumber(event) {
+//   const phoneNumber = event.pathParameters.phoneNumber;
+//   const customerKey = `customer:${phoneNumber}`;
+//   const customer = await redisClient.json.get(customerKey, "$");
+//   if (!customer) {
+//     return {
+//       statusCode: 404,
+//       body: JSON.stringify({ message: "Customer not found." }),
+//     };
+//   }
+//   return {
+//     statusCode: 200,
+//     body: JSON.stringify(customer),
+//   };
+// }
+// async function handlePostOrders(event) {
+//   const order = JSON.parse(event.body);
+//   if (!order.orderId) {
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify({ message: "Missing order ID." }),
+//     };
+//   }
+//   const orderKey = `order:${order.orderId}`;
+//   await redisClient.json.set(orderKey, "$", order);
+//   return {
+//     statusCode: 201,
+//     body: JSON.stringify({ message: "Order created successfully.", order }),
+//   };
+// }
+// async function handleGetOrderByOrderId(event) {
+//   const orderId = event.pathParameters.orderId;
+//   const orderKey = `order:${orderId}`;
+//   const order = await redisClient.json.get(orderKey, "$");
+//   if (!order) {
+//     return {
+//       statusCode: 404,
+//       body: JSON.stringify({ message: "Order not found." }),
+//     };
+//   }
+//   return {
+//     statusCode: 200,
+//     body: JSON.stringify(order),
+//   };
+// }
+// async function handlePostOrderItems(event) {
+//   const orderItem = JSON.parse(event.body);
+//   const validate = ajv.compile(Schema);
+//   if (!validate(orderItem)) {
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify({
+//         message: "Invalid order item data.",
+//         errors: validate.errors,
+//       }),
+//     };
+//   }
+//   // Assuming addOrderItem function returns an ID or similar identifier for the new order item
+//   const orderItemId = await addOrderItem({ redisClient, orderItem });
+//   return {
+//     statusCode: 201,
+//     body: JSON.stringify({
+//       message: "Order item added successfully.",
+//       orderItemId,
+//     }),
+//   };
+// }
+// async function handleGetOrderItemByOrderItemId(event) {
+//   const orderItemId = event.pathParameters.orderItemId;
+//   const orderItem = await getOrderItem({ redisClient, orderItemId });
+//   if (!orderItem) {
+//     return {
+//       statusCode: 404,
+//       body: JSON.stringify({ message: "Order item not found." }),
+//     };
+//   }
+//   return {
+//     statusCode: 200,
+//     body: JSON.stringify(orderItem),
+//   };
+// }
+
+///
+///
+///
+///
 
 // Implement other handler functions similarly
 
@@ -356,4 +360,3 @@ async function handleGetOrderItemByOrderItemId(event) {
 //   }
 // });
 
-console.log("Hello");
