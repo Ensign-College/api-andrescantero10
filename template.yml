@@ -30,7 +30,7 @@ Resources:
       RootPath:
         Type: Api
         Properties:
-          Path: /
+          Path: /api
           Method: any
 
      
