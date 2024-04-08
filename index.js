@@ -15,64 +15,69 @@ const redisClient = Redis.createClient({
 });
 
 exports.handler = async (event) => {
-  await redisClient.connect(); // Connect to Redis
-
-  try {
-    switch (event.path) {
-      case "/customers":
-        if (event.httpMethod === "POST") {
-          // Handle POST /customers
-          return await handlePostCustomers(event);
-        } else if (event.httpMethod === "GET") {
-          // Handle GET /customers
-          return await handleGetCustomers(event);
-        }
-        break;
-      case event.path.match(/^\/customers\/\w+$/) && event.path:
-        if (event.httpMethod === "GET") {
-          // Handle GET /customers/:phoneNumber
-          return await handleGetCustomerByPhoneNumber(event);
-        }
-        break;
-      case "/orders":
-        if (event.httpMethod === "POST") {
-          // Handle POST /orders
-          return await handlePostOrders(event);
-        }
-        break;
-      case event.path.match(/^\/orders\/\w+$/) && event.path:
-        if (event.httpMethod === "GET") {
-          // Handle GET /orders/:orderId
-          return await handleGetOrderByOrderId(event);
-        }
-        break;
-      case "/orderItems":
-        if (event.httpMethod === "POST") {
-          // Handle POST /orderItems
-          return await handlePostOrderItems(event);
-        }
-        break;
-      case event.path.match(/^\/orderItems\/\w+$/) && event.path:
-        if (event.httpMethod === "GET") {
-          // Handle GET /orderItems/:orderItemId
-          return await handleGetOrderItemByOrderItemId(event);
-        }
-        break;
-      default:
-        return {
-          statusCode: 404,
-          body: "Endpoint not found",
-        };
-    }
-  } catch (error) {
-    console.error("Error:", error);
-    return {
-      statusCode: 500,
-      body: "Internal Server Error",
-    };
-  } finally {
-    await redisClient.disconnect();
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Hello from Lambda!" }),
+  };
   }
+  // await redisClient.connect(); // Connect to Redis
+
+  // try {
+  //   switch (event.path) {
+  //     case "/customers":
+  //       if (event.httpMethod === "POST") {
+  //         // Handle POST /customers
+  //         return await handlePostCustomers(event);
+  //       } else if (event.httpMethod === "GET") {
+  //         // Handle GET /customers
+  //         return await handleGetCustomers(event);
+  //       }
+  //       break;
+  //     case event.path.match(/^\/customers\/\w+$/) && event.path:
+  //       if (event.httpMethod === "GET") {
+  //         // Handle GET /customers/:phoneNumber
+  //         return await handleGetCustomerByPhoneNumber(event);
+  //       }
+  //       break;
+  //     case "/orders":
+  //       if (event.httpMethod === "POST") {
+  //         // Handle POST /orders
+  //         return await handlePostOrders(event);
+  //       }
+  //       break;
+  //     case event.path.match(/^\/orders\/\w+$/) && event.path:
+  //       if (event.httpMethod === "GET") {
+  //         // Handle GET /orders/:orderId
+  //         return await handleGetOrderByOrderId(event);
+  //       }
+  //       break;
+  //     case "/orderItems":
+  //       if (event.httpMethod === "POST") {
+  //         // Handle POST /orderItems
+  //         return await handlePostOrderItems(event);
+  //       }
+  //       break;
+  //     case event.path.match(/^\/orderItems\/\w+$/) && event.path:
+  //       if (event.httpMethod === "GET") {
+  //         // Handle GET /orderItems/:orderItemId
+  //         return await handleGetOrderItemByOrderItemId(event);
+  //       }
+  //       break;
+  //     default:
+  //       return {
+  //         statusCode: 404,
+  //         body: "Endpoint not found",
+  //       };
+  //   }
+  // } catch (error) {
+  //   console.error("Error:", error);
+  //   return {
+  //     statusCode: 500,
+  //     body: "Internal Server Error",
+  //   };
+  // } finally {
+  //   await redisClient.disconnect();
+  // }
 };
 
 async function handlePostCustomers(event) {
