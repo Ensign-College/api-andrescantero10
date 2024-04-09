@@ -22,7 +22,7 @@ exports.handler = async (event) => {
       body: JSON.stringify({ message: "Hello from GET!", event}), 
     };
   }
-  else if (path === "/costumers" && httpMethod === "GET") {
+  else if (path === "/customers" && httpMethod === "GET") {
     return await handleGetCustomers(event);
  
   }
