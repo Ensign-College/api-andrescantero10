@@ -9,13 +9,24 @@ const Redis = require("redis");
 // const Schema = JSON.parse(fs.readFileSync("./orderItemSchema.json", "utf-8"));
 // const ajv = new Ajv();
 
-const redisClient = Redis.createClient({
-  url: `redis://${process.env.REDIS_HOST}:6379`,
-});
+let redisClient;
+
+async function getRedisClient() {
+    if (!redisClient) {
+        redisClient = Redis.createClient({
+            url: `redis://${process.env.REDIS_HOST}:6379`,
+        });
+        await redisClient.connect();
+    } else if (!redisClient.isOpen) {
+        // Reconnect if the client is not open
+        await redisClient.connect();
+    }
+    return redisClient;
+}
 
 
 exports.handler = async (event) => {
-  await redisClient.connect(); // Connect to Redis
+  const client = await getRedisClient();
 
   const { httpMethod, path } = event; // Extract the HTTP method and path from the event
   event.redisClient = redisClient;
