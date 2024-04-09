@@ -14,13 +14,17 @@ const redisClient = Redis.createClient({
 });
 
 exports.handler = async (event) => {
-  const { httpMethod } = event;
+  const { httpMethod, path } = event; // Extract the HTTP method and path from the event
   event.redisClient = redisClient;
-  if (httpMethod === "GET") {
+  if (path === "/" && httpMethod === "GET") {
     return{
       statusCode: 200,
       body: JSON.stringify({ message: "Hello from GET!", event}), 
     };
+  }
+  else if (path === "/costumers" && httpMethod === "GET") {
+    return await handlePostCustomers(event);
+ 
   }
   else if (httpMethod === "POST") {
   
@@ -100,16 +104,17 @@ exports.handler = async (event) => {
   // }
 // };
 
-// async function handlePostCustomers(event) {
-//   const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
-//   if (!firstName || !lastName || !phoneNumber) {
-//     return {
-//       statusCode: 400,
-//       body: JSON.stringify({
-//         message: "Missing required customer information.",
-//       }),
-//     };
-//   }
+async function handlePostCustomers(event) {
+  const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
+  if (!firstName || !lastName || !phoneNumber) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Missing required customer information.",
+      }),
+    };
+  }
+}
 //   const customerKey = `customer:${phoneNumber}`;
 //   const existingCustomer = await redisClient.json.get(customerKey, "$");
 //   if (existingCustomer) {

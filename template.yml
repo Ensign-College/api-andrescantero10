@@ -32,6 +32,11 @@ Resources:
           Properties:
             Path: /
             Method: any
+        CustomersPath:
+          Type: Api
+          Properties:
+            Path: /customers
+            Method: any    
 
      
 
