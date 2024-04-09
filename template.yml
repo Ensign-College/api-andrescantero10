@@ -36,6 +36,11 @@ Resources:
           Type: Api
           Properties:
             Path: /customers
+            Method: any
+        CustomersByPhonePath:
+          Type: Api
+          Properties:
+            Path: /customers/{phoneNumber}
             Method: any    
 
      

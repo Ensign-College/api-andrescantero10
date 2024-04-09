@@ -35,7 +35,10 @@ exports.handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({ message: "Hello from POST!", event}), 
     };
-  } else {
+  } else if (path === "/customers" && httpMethod === "POST") {
+    return await handlePostCustomers(event);
+  }
+   else {
     return {
       statusCode: 405,
       body: "Method Not Allowed",
@@ -107,39 +110,39 @@ exports.handler = async (event) => {
   // }
 // };
 
-// async function handlePostCustomers(event) {
-//   const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
-//   if (!firstName || !lastName || !phoneNumber) {
-//     return {
-//       statusCode: 400,
-//       body: JSON.stringify({
-//         message: "Missing required customer information.",
-//       }),
-//     };
-//   }
-//   const customerKey = `customer:${phoneNumber}`;
-//   const existingCustomer = await redisClient.json.get(customerKey, "$");
-//   if (existingCustomer) {
-//     return {
-//       statusCode: 409,
-//       body: JSON.stringify({ message: "Customer already exists." }),
-//     };
-//   }
-//   await redisClient.json.set(customerKey, "$", {
-//     firstName,
-//     lastName,
-//     phoneNumber,
-//   });
-//   return {
-//     statusCode: 201,
-//     body: JSON.stringify({
-//       message: "Customer created successfully.",
-//       firstName,
-//       lastName,
-//       phoneNumber,
-//     }),
-//   };
-// }
+async function handlePostCustomers(event) {
+  const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
+  if (!firstName || !lastName || !phoneNumber) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: "Missing required customer information.",
+      }),
+    };
+  }
+  const customerKey = `customer:${phoneNumber}`;
+  const existingCustomer = await redisClient.json.get(customerKey, "$");
+  if (existingCustomer) {
+    return {
+      statusCode: 409,
+      body: JSON.stringify({ message: "Customer already exists." }),
+    };
+  }
+  await redisClient.json.set(customerKey, "$", {
+    firstName,
+    lastName,
+    phoneNumber,
+  });
+  return {
+    statusCode: 201,
+    body: JSON.stringify({
+      message: "Customer created successfully.",
+      firstName,
+      lastName,
+      phoneNumber,
+    }),
+  };
+}
 async function handleGetCustomers(event) {
   const customerKeys = await redisClient.keys("customer:*");
   const customers = await Promise.all(
