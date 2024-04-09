@@ -41,7 +41,30 @@ Resources:
           Type: Api
           Properties:
             Path: /customers/{phoneNumber}
-            Method: any    
+            Method: any
+        OrdersPath:
+          Type: Api
+          Properties:
+            Path: /orders
+            Method: any
+        OrdersByIdPath:
+          Type: Api
+          Properties:
+            Path: /orders/{orderId}
+            Method: any
+        OrderItemsPath:
+          Type: Api
+          Properties:
+            Path: /orderItems
+            Method: any
+        OrderItemsByIdPath:
+          Type: Api
+          Properties:
+            Path: /orderItems/{orderItemId}
+            Method: any
+            
+
+
 
      
 
