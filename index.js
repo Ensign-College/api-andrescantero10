@@ -23,7 +23,7 @@ exports.handler = async (event) => {
     };
   }
   else if (path === "/costumers" && httpMethod === "GET") {
-    return await handlePostCustomers(event);
+    return await handleGetCustomers(event);
  
   }
   else if (httpMethod === "POST") {
@@ -104,17 +104,16 @@ exports.handler = async (event) => {
   // }
 // };
 
-async function handlePostCustomers(event) {
-  const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
-  if (!firstName || !lastName || !phoneNumber) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({
-        message: "Missing required customer information.",
-      }),
-    };
-  }
-}
+// async function handlePostCustomers(event) {
+//   const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
+//   if (!firstName || !lastName || !phoneNumber) {
+//     return {
+//       statusCode: 400,
+//       body: JSON.stringify({
+//         message: "Missing required customer information.",
+//       }),
+//     };
+//   }
 //   const customerKey = `customer:${phoneNumber}`;
 //   const existingCustomer = await redisClient.json.get(customerKey, "$");
 //   if (existingCustomer) {
@@ -138,18 +137,18 @@ async function handlePostCustomers(event) {
 //     }),
 //   };
 // }
-// async function handleGetCustomers(event) {
-//   const customerKeys = await redisClient.keys("customer:*");
-//   const customers = await Promise.all(
-//     customerKeys.map(
-//       async (key) => await redisClient.json.get(key, { path: "$" })
-//     )
-//   );
-//   return {
-//     statusCode: 200,
-//     body: JSON.stringify(customers),
-//   };
-// }
+async function handleGetCustomers(event) {
+  const customerKeys = await redisClient.keys("customer:*");
+  const customers = await Promise.all(
+    customerKeys.map(
+      async (key) => await redisClient.json.get(key, { path: "$" })
+    )
+  );
+  return {
+    statusCode: 200,
+    body: JSON.stringify(customers),
+  };
+}
 // async function handleGetCustomerByPhoneNumber(event) {
 //   const phoneNumber = event.pathParameters.phoneNumber;
 //   const customerKey = `customer:${phoneNumber}`;
