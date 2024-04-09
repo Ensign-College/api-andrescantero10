@@ -12,10 +12,11 @@ const Redis = require("redis");
 const redisClient = Redis.createClient({
   url: `redis://${process.env.REDIS_HOST}:6379`,
 });
-  await redisClient.connect(); // Connect to Redis
 
 
 exports.handler = async (event) => {
+  await redisClient.connect(); // Connect to Redis
+
   const { httpMethod, path } = event; // Extract the HTTP method and path from the event
   event.redisClient = redisClient;
   if (path === "/" && httpMethod === "GET") {
