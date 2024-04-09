@@ -39,14 +39,14 @@ exports.handler = async (event) => {
   else if (path === "/customers" && httpMethod === "GET") {
     return await handleGetCustomers(event);
  
-  }
-  else if (httpMethod === "POST") {
+  // }
+  // else if (httpMethod === "POST") {
   
-    return{
-      statusCode: 200,
-      body: JSON.stringify({ message: "Hello from POST!", event}), 
-    };
-  } else if (path === "/customers" && httpMethod === "POST") {
+  //   return{
+  //     statusCode: 200,
+  //     body: JSON.stringify({ message: "Hello from POST!", event}), 
+  //   };
+  // } else if (path === "/customers" && httpMethod === "POST") {
     return await handlePostCustomers(event);
   }
    else {
