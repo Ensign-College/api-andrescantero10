@@ -28,19 +28,19 @@ exports.handler = async (event) => {
 
   const { httpMethod, path } = event; // Extract the HTTP method and path from the event
   event.redisClient = redisClient;
-  if (path === "/customers" && httpMethod === "GET") {
-    return await handleGetCustomers(event);
-  } else if (path === "/customers" && httpMethod === "POST") {
-    return await handlePostCustomers(event);
-  } else if (path.match(/^\/customers\/\w+$/) && httpMethod === "GET") {
-    return await handleGetCustomerByPhoneNumber(event);
+  if (path === "/customers" && httpMethod === "GET") { // Check if the path is /customers and the HTTP method is GET
+    return await handleGetCustomers(event); // Call the handleGetCustomers function
+  } else if (path === "/customers" && httpMethod === "POST") { // Check if the path is /customers and the HTTP method is POST
+    return await handlePostCustomers(event); // Call the handlePostCustomers function
+  } else if (path.match(/^\/customers\/\w+$/) && httpMethod === "GET") { // Check if the path matches /customers/{phoneNumber} and the HTTP method is GET
+    return await handleGetCustomerByPhoneNumber(event); // Call the handleGetCustomerByPhoneNumber function
   }
   //
   else if (path === "/orders" && httpMethod === "POST") {
     return await handlePostOrders(event);
   } else if (path === "/orders" && httpMethod === "GET") {
     return await handleGetOrders(event);
-  } else if (path.match(/^\/orders\/\w+$/) && httpMethod === "GET") {
+  } else if (path.match(/^\/orders\/\w+$/) && httpMethod === "GET") { // Check if the path matches /orders/{orderId} and the HTTP method is GET
     return await handleGetOrderByOrderId(event);
   } else if (path === "/orderItems" && httpMethod === "POST") {
     return await handlePostOrderItems(event);
@@ -57,7 +57,7 @@ exports.handler = async (event) => {
 };
 
 async function handlePostCustomers(event) {
-  const { firstName, lastName, phoneNumber } = JSON.parse(event.body);
+  const { firstName, lastName, phoneNumber } = JSON.parse(event.body); // Extract the firstName, lastName, and phoneNumber from the request body
   if (!firstName || !lastName || !phoneNumber) {
     return {
       statusCode: 400,
@@ -67,11 +67,11 @@ async function handlePostCustomers(event) {
     };
   }
   const customerKey = `customer:${phoneNumber}`;
-  const existingCustomer = await redisClient.json.get(customerKey, "$");
+  const existingCustomer = await redisClient.json.get(customerKey, "$"); // Check if a customer with the given phone number already exists
   if (existingCustomer) {
     return {
-      statusCode: 409,
-      body: JSON.stringify({ message: "Customer already exists." }),
+      statusCode: 409, 
+      body: JSON.stringify({ message: "Customer already exists." }), 
     };
   }
   await redisClient.json.set(customerKey, "$", {
@@ -90,10 +90,10 @@ async function handlePostCustomers(event) {
   };
 }
 async function handleGetCustomers(event) {
-  const customerKeys = await redisClient.keys("customer:*");
+  const customerKeys = await redisClient.keys("customer:*"); // Get all keys that match the pattern "customer:*"
   const customers = await Promise.all(
     customerKeys.map(
-      async (key) => await redisClient.json.get(key, { path: "$" })
+      async (key) => await redisClient.json.get(key, { path: "$" }) // Get the value of each key
     )
   );
   return {
@@ -102,9 +102,9 @@ async function handleGetCustomers(event) {
   };
 }
 async function handleGetCustomerByPhoneNumber(event) {
-  const phoneNumber = event.pathParameters.phoneNumber;
+  const phoneNumber = event.pathParameters.phoneNumber; // Extract the phone number from the path parameters
   const customerKey = `customer:${phoneNumber}`;
-  const customer = await redisClient.json.get(customerKey, "$");
+  const customer = await redisClient.json.get(customerKey, "$"); // Get the customer with the given phone number
   if (!customer) {
     return {
       statusCode: 404,
@@ -133,7 +133,7 @@ async function handlePostOrders(event) {
 }
 async function handleGetOrderByOrderId(event) {
   const orderId = event.pathParameters.orderId;
-  const orderKey = `order:${orderId}`;
+  const orderKey = `order:${orderId}`; // Create the key for the order
   const order = await redisClient.json.get(orderKey, "$");
   if (!order) {
     return {
