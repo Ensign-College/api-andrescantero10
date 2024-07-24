@@ -52,16 +52,16 @@ const getOrderItem = async ({ redisClient, orderItemId }) => {
 };
 
 // Function to search for order items in Redis
-const searchOrderItems = async ({ redisClient, query, key, isText }) => {
+const searchOrderItems = async ({ redisClient, query, key, isText }) => { // Add isText parameter to determine if the search is based on text or exact match
   try {
     let value = query[key];
-    const resultObject = isText ? await redisClient.ft.search('idx:OrderItem', `@${key}:(${value}*)`) : await redisClient.ft.search('idx:OrderItem', `@${key}:{${value}}`);
-    return resultObject.documents.map(resultObject => ({ ...resultObject.value, orderItemId: resultObject.id.split(':')[1] }));
+    const resultObject = isText ? await redisClient.ft.search('idx:OrderItem', `@${key}:(${value}*)`) : await redisClient.ft.search('idx:OrderItem', `@${key}:{${value}}`); // Search for order items based on the query
+    return resultObject.documents.map(resultObject => ({ ...resultObject.value, orderItemId: resultObject.id.split(':')[1] })); // Return the order items
   } catch (error) {
     throw new Error(`Error searching for order items: ${error}`);
   }
 };
 
 // Export functions for use in other files
-module.exports = { addOrderItem, updateOrderItem, getOrderItem, searchOrderItems };
+module.exports = { addOrderItem, updateOrderItem, getOrderItem, searchOrderItems }; 
 module.exports.redisClient = redisClient;
